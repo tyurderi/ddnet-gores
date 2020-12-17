@@ -353,6 +353,15 @@ int CControls::SnapInput(int *pData)
 			pDummyInput->m_Fire = m_InputData[!g_Config.m_ClDummy].m_Fire;
 		}
 
+		// For gores: If you get ninja, you'll die.
+		if (
+		    g_Config.m_ClGores == 1
+		    && m_pClient->m_Snap.m_pLocalCharacter
+		    && m_pClient->m_Snap.m_pLocalCharacter->m_Weapon == WEAPON_NINJA
+        ) {
+		    m_pClient->SendKill(-1);
+		}
+
 		// stress testing
 #ifdef CONF_DEBUG
 		if(g_Config.m_DbgStress)

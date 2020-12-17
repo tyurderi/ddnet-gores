@@ -641,6 +641,14 @@ void CChat::AddLine(int ClientID, int Team, const char *pLine)
 					  (m_pClient->m_Snap.m_LocalClientID != ClientID && m_pClient->m_aClients[ClientID].m_Foe))))
 		return;
 
+    // Suppress unwanted messages
+	if (
+	    g_Config.m_ClGores
+	    && str_find(pLine, "Everyone in your locked team was killed because you killed.")
+	) {
+	    return;
+	}
+
 	// trim right and set maximum length to 256 utf8-characters
 	int Length = 0;
 	const char *pStr = pLine;

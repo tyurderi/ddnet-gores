@@ -2190,6 +2190,12 @@ void CMenus::RenderSettingsDDNet(CUIRect MainView)
 		Right.HSplitTop(60.0f, 0, &Right);
 	}
 
+	Right.HSplitTop(20.0f, &Button, &Right);
+    if(DoButton_CheckBox(&g_Config.m_ClGores, Localize("Gores"), g_Config.m_ClGores, &Button))
+    {
+        g_Config.m_ClGores ^= 1;
+    }
+
 	Right.HSplitTop(40.0f, 0, &Right);
 
 	Left.HSplitTop(20.0f, &Button, &Left);
