@@ -356,6 +356,25 @@ void CPlayers::RenderPlayer(
 			Graphics()->LinesEnd();
 		}
 
+		if (g_Config.m_ClBalanceHelp && !Local && g_Config.m_Debug) {
+            Graphics()->TextureClear();
+
+            vec2 InitPos = Position;
+            vec2 FinishPos = InitPos - vec2(0, 250.0f);
+
+            Graphics()->LinesBegin();
+            ColorRGBA BalanceHelperColor(1.0f, 0.0f, 0.0f);
+
+            if (abs(Position.x - m_pClient->m_aClients[m_pClient->m_LocalIDs[g_Config.m_ClDummy]].m_RenderPos.x) < 3.0f) {
+                BalanceHelperColor = color_invert(BalanceHelperColor);
+            }
+
+            Graphics()->SetColor(BalanceHelperColor.WithAlpha(Alpha));
+            IGraphics::CLineItem LineItem(InitPos.x, InitPos.y, FinishPos.x, FinishPos.y);
+            Graphics()->LinesDraw(&LineItem, 1);
+            Graphics()->LinesEnd();
+        }
+
 		Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 		Graphics()->QuadsSetRotation(State.GetAttach()->m_Angle * pi * 2 + Angle);
 

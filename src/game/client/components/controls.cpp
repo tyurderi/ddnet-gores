@@ -74,6 +74,9 @@ void CControls::OnReset()
 	for(int &AmmoCount : m_AmmoCount)
 		AmmoCount = 0;
 	m_OldMouseX = m_OldMouseY = 0.0f;
+
+    m_FreezeStart = 0;
+    m_LastWalk = 0.0f;
 }
 
 void CControls::ResetInput(int Dummy)
@@ -356,10 +359,45 @@ int CControls::SnapInput(int *pData)
 		// For gores: If you get ninja, you'll die.
 		if (
 		    g_Config.m_ClGores == 1
-		    && m_pClient->m_Snap.m_pLocalCharacter
-		    && m_pClient->m_Snap.m_pLocalCharacter->m_Weapon == WEAPON_NINJA
         ) {
-		    m_pClient->SendKill(-1);
+            if (IsFrozen() && IsGrounded()) {
+                m_pClient->SendKill(-1);
+            }
+		}
+
+		if (g_Config.m_ClWalkSpeed != 0) {
+		    m_LastWalk += 1.0f;
+
+		    if (m_LastWalk < g_Config.m_ClWalkSpeed) {
+		        m_InputData[g_Config.m_ClDummy].m_Direction = 0;
+		    } else {
+		        m_LastWalk = 0;
+		    }
+		}
+
+		if (g_Config.m_ClBalanceHelp) {
+            int NearestID = HookedID(LocalID());
+
+            if (NearestID > -1) {
+                vec2 LocalPos = GetPos(LocalID());
+                vec2 PlayerPos = GetPos(NearestID);
+                vec2 Diff = LocalPos - PlayerPos;
+                int Direction = 0;
+                float MaxDiff = 3.5f;
+
+                if (g_Config.m_Debug)
+                    dbg_msg("balance_help", "(x: %.2f, y: %.2f) %s", Diff.x, Diff.y, m_pClient->m_aClients[NearestID].m_aName);
+
+                if (abs(Diff.x) <= 20.0f && abs(Diff.y) <= 28.0f*2) {
+                    if (Diff.x > MaxDiff) {
+                        Direction = -1;
+                    } else if (Diff.x < -MaxDiff) {
+                        Direction = 1;
+                    }
+
+                    m_InputData[g_Config.m_ClDummy].m_Direction = Direction;
+                }
+            }
 		}
 
 		// stress testing
@@ -595,4 +633,28 @@ void CControls::ClampMousePos()
 		if(length(m_MousePos[g_Config.m_ClDummy]) > MouseMax)
 			m_MousePos[g_Config.m_ClDummy] = normalize(m_MousePos[g_Config.m_ClDummy]) * MouseMax;
 	}
+}
+
+bool CControls::IsFrozen()
+{
+    return m_pClient->m_Snap.m_pLocalCharacter
+        && m_pClient->m_Snap.m_pLocalCharacter->m_Weapon == WEAPON_NINJA;
+}
+
+bool CControls::IsGrounded()
+{
+    if (!m_pClient->m_Snap.m_pLocalCharacter) {
+        return false;
+    }
+
+    const CNetObj_Character *pChar = m_pClient->m_Snap.m_pLocalCharacter;
+    vec2 Pos = vec2(pChar->m_X, pChar->m_Y);
+    int ProximityRadius = 28*2.5;
+
+    if(Collision()->CheckPoint(Pos.x + ProximityRadius / 2, Pos.y + ProximityRadius / 2 + 5))
+        return true;
+    if(Collision()->CheckPoint(Pos.x - ProximityRadius / 2, Pos.y + ProximityRadius / 2 + 5))
+        return true;
+
+    return false;
 }

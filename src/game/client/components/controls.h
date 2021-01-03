@@ -9,6 +9,35 @@
 
 class CControls : public CComponent
 {
+    bool IsFrozen();
+    bool IsGrounded();
+    int GetNearestID() {
+        int LocalClientID = m_pClient->m_LocalIDs[g_Config.m_ClDummy];
+        float LastDistance = -1;
+        int NearestID = -1;
+        vec2 LocalPos = m_pClient->m_aClients[LocalClientID].m_Predicted.m_Pos;
+        for (int i = 0; i < MAX_CLIENTS; i++) {
+            vec2 PlayerPos = m_pClient->m_aClients[i].m_Predicted.m_Pos;
+            float Distance = distance(LocalPos, PlayerPos) < LastDistance;
+
+            if (i == LocalClientID) {
+                continue;
+            }
+
+            if (NearestID == -1 || Distance < LastDistance) {
+                LastDistance = Distance;
+                NearestID = i;
+            }
+        }
+        return NearestID;
+    };
+    int LocalID() { return m_pClient->m_LocalIDs[g_Config.m_ClDummy]; };
+    vec2 GetPos(int ClientID) { return m_pClient->m_aClients[ClientID].m_Predicted.m_Pos; };
+    int HookedID(int ClientID) { return m_pClient->m_aClients[ClientID].m_Predicted.m_HookedPlayer; }
+
+    int m_FreezeStart;
+    float m_LastWalk;
+
 public:
 	vec2 m_MousePos[NUM_DUMMIES];
 	vec2 m_TargetPos[NUM_DUMMIES];

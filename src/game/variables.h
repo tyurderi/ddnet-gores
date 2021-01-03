@@ -144,6 +144,8 @@ MACRO_CONFIG_INT(ClDummyHook, cl_dummy_hook, 0, 0, 1, CFGFLAG_CLIENT, "Whether d
 
 // gores
 MACRO_CONFIG_INT(ClGores, cl_gores, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "0 - disabled / 1 - enabled")
+MACRO_CONFIG_INT(ClWalkSpeed, cl_walk_speed, 0, 1, 10000, CFGFLAG_CLIENT, "")
+MACRO_CONFIG_INT(ClBalanceHelp, cl_balance_help, 0, 0, 1, CFGFLAG_CLIENT, "Show helpers to balance on a tee.")
 
 // start menu
 MACRO_CONFIG_INT(ClShowStartMenuImages, cl_show_start_menu_images, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show start menu images")
